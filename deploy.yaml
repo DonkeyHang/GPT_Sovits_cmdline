@@ -33,7 +33,7 @@ spec:
         - name: LANG
           value: en_US.utf-8
         args:
-        - python service/app.py
+        - python server/app.py
         command:
         - conda
         - run
