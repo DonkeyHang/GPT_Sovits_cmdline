@@ -1,0 +1,22 @@
+variables:
+  DOCKER_HOST: tcp://localhost:2375
+  TLS_VERIFY: 0
+
+buildah:
+  image: lilith-registry-vpc.cn-shanghai.cr.aliyuncs.com/tsh-hdp/public-image-buildah:1.30.0-dev
+  stage: build
+  before_script:
+    - if which buildah > /dev/null; then buildah login "${DOCKER_REGISTRY}" -u "${DOCKER_USERNAME}" -p "${DOCKER_PWD}"; fi
+  script:
+    - make ci-build-buildah
+  when: manual
+deploy ai-speech dev:
+  image: lilith-registry-vpc.cn-shanghai.cr.aliyuncs.com/tsh-hdp/public-image-py-script
+  stage: deploy
+  variables:
+    APP_NAME: ai-speech
+    DEPLOY_ENV: dev
+    NAMESPACE: aigc
+  script:
+    - make ci-deploy-app
+  when: manual
