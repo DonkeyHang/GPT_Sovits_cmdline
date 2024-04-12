@@ -76,16 +76,46 @@ def process_batch(sovits_weights, gpt_weights, input_folder, output_folder, para
                             how_to_cut
                             )
 
+def get_args_vscode_debug():
+    parser = argparse.ArgumentParser(description="Batch Run TTS Inference")
+    parser.add_argument("--sovits_weights", help="Path to sovits weights file",
+                        default="SoVITS_weights/plasticfork1_e8_s72.pth")
+    parser.add_argument("--gpt_weights", help="Path to gpt weights file",
+                        default="GPT_weights/plasticfork1-e15.ckpt")
+    parser.add_argument("--parameters_file", type=str, help="File containing parameters for batch processing",
+                        default='inference_parameters_test.txt')
+    parser.add_argument("--input_folder", type=str, help="Folder of the input audio files",
+                        default='/Users/donkeyddddd/Documents/Rx_projects/git_projects/GPT_Sovits_cmdline/input_audio')
+    parser.add_argument("--output_folder", type=str, help="Folder to save the output audio files",
+                        default='/Users/donkeyddddd/Documents/Rx_projects/git_projects/GPT_Sovits_cmdline/output_audio/')
+
+    return parser.parse_args(args=[])
+
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Batch Run TTS Inference")
-    parser.add_argument("--sovits_weights", required=True, help="Path to sovits weights file")
-    parser.add_argument("--gpt_weights", required=True, help="Path to gpt weights file")
-    parser.add_argument("--input_folder", type=str, default='input_audio', help="Folder of the input audio files")
-    parser.add_argument("--output_folder", type=str, default='output_audio', help="Folder to save the output audio files")
-    parser.add_argument("--parameters_file", type=str, default='inference_parameters.txt', help="File containing parameters for batch processing")
+    # ============================
+    # origin parser can used by inference.sh
 
-    args = parser.parse_args()
+    # parser = argparse.ArgumentParser(description="Batch Run TTS Inference")
+    # parser.add_argument("--sovits_weights", required=True, help="Path to sovits weights file",
+    #                     default="SoVITS_weights/plasticfork1_e8_s72.pth")
+    # parser.add_argument("--gpt_weights", required=True, help="Path to gpt weights file",
+    #                     default="GPT_weights/plasticfork1-e15.ckpt")
+    # parser.add_argument("--parameters_file", type=str, help="File containing parameters for batch processing",
+    #                     default='inference_parameters_test.txt')
+    # parser.add_argument("--input_folder", type=str, help="Folder of the input audio files",
+    #                     default='input_audio')
+    # parser.add_argument("--output_folder", type=str, help="Folder to save the output audio files",
+    #                     default='output_audio')
+    # args = parser.parse_args()
+    
+    # ============================
+
+    
+    # ============================
+    # vscode debug used
+    args = get_args_vscode_debug()
+    # ============================
 
     if not os.path.exists(args.output_folder):
         os.makedirs(args.output_folder)
