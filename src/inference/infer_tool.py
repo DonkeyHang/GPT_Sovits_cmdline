@@ -253,31 +253,10 @@ class TTSInference(InferenceModule):
             if max_audio>1:audio/=max_audio
             audio_opt.append(audio)
             audio_opt.append(zero_wav)
+        
         yield self.sovits_config.data.sampling_rate, (np.concatenate(audio_opt, 0) * 32768).astype(
             np.int16
         )
-
-            
-    def get_bert_feature(self, text, word2ph):
-        with torch.no_grad():
-            inputs = self.tokenizer(text, return_tensors="pt")
-            for i in inputs:
-                inputs[i] = inputs[i].to(self.device)
-            res = self.bert_model(**inputs, output_hidden_states=True)
-            res = torch.cat(res["hidden_states"][-3:-2], -1)[0].cpu()[1:-1]
-        assert len(word2ph) == len(text)
-        phone_level_feature = []
-        for i in range(len(word2ph)):
-            repeat_feature = res[i].repeat(word2ph[i], 1)
-            phone_level_feature.append(repeat_feature)
-        phone_level_feature = torch.cat(phone_level_feature, dim=0)
-        return phone_level_feature.T
-
-
-    def clean_text_inf(self, text, language):
-        phones, word2ph, norm_text = clean_text(text, language)
-        phones = cleaned_text_to_sequence(phones)
-        return phones, word2ph, norm_text
 
 
     def get_phones_and_bert(self, text, language):
@@ -339,6 +318,28 @@ class TTSInference(InferenceModule):
         return phones, bert_features.to(dtype), norm_text
 
 
+    def get_bert_feature(self, text, word2ph):
+        with torch.no_grad():
+            inputs = self.tokenizer(text, return_tensors="pt")
+            for i in inputs:
+                inputs[i] = inputs[i].to(self.device)
+            res = self.bert_model(**inputs, output_hidden_states=True)
+            res = torch.cat(res["hidden_states"][-3:-2], -1)[0].cpu()[1:-1]
+        assert len(word2ph) == len(text)
+        phone_level_feature = []
+        for i in range(len(word2ph)):
+            repeat_feature = res[i].repeat(word2ph[i], 1)
+            phone_level_feature.append(repeat_feature)
+        phone_level_feature = torch.cat(phone_level_feature, dim=0)
+        return phone_level_feature.T
+
+
+    def clean_text_inf(self, text, language):
+        phones, word2ph, norm_text = clean_text(text, language)
+        phones = cleaned_text_to_sequence(phones)
+        return phones, word2ph, norm_text
+
+
     def get_bert_inf(self, phones, word2ph, norm_text, language):
         language=language.replace("all_","")
         if language == "zh":
@@ -367,3 +368,4 @@ class TTSInference(InferenceModule):
             center=False,
         )
         return spec
+    

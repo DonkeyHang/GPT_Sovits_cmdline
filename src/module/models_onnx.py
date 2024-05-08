@@ -1,3 +1,7 @@
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import copy
 import math
 import torch
@@ -15,6 +19,9 @@ from module.mrte_model import MRTE
 from module.quantize import ResidualVectorQuantizer
 from text import symbols
 from torch.cuda.amp import autocast
+
+
+
 
 
 class StochasticDurationPredictor(nn.Module):
@@ -892,7 +899,7 @@ class SynthesizerTrn(nn.Module):
             # self.enc_p.encoder_text.requires_grad_(False)
             # self.enc_p.mrte.requires_grad_(False)
 
-    def forward(self, codes, text, refer):
+    def forward(self, codes, text, refer, noise_scale=0.5):
         refer_mask = torch.ones_like(refer[:1,:1,:])
         ge = self.ref_enc(refer * refer_mask, refer_mask)
 
@@ -905,7 +912,7 @@ class SynthesizerTrn(nn.Module):
             quantized, text, ge
         )
         
-        z_p = m_p + torch.randn_like(m_p) * torch.exp(logs_p)
+        z_p = m_p + torch.randn_like(m_p) * torch.exp(logs_p) * noise_scale
 
         z = self.flow(z_p, y_mask, g=ge, reverse=True)
 

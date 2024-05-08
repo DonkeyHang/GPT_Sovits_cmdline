@@ -1,15 +1,20 @@
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from module.models_onnx import SynthesizerTrn, symbols
 from AR.models.t2s_lightning_module_onnx import Text2SemanticLightningModule
 import torch
 import torchaudio
 from torch import nn
 from feature_extractor import cnhubert
-cnhubert_base_path = "/pretrained_models/chinese-hubert-base"
+# cnhubert_base_path = "/pretrained_models/chinese-hubert-base"
+cnhubert_base_path = "/Users/donkeyddddd/Documents/Rx_projects/git_projects/GPT_Sovits_cmdline/pretrained_models/chinese-hubert-base"
 cnhubert.cnhubert_base_path=cnhubert_base_path
 ssl_model = cnhubert.get_model()
 from text import cleaned_text_to_sequence
 import soundfile
-from my_utils import load_audio
+# from my_utils import load_audio
 import os
 import json
 
@@ -230,7 +235,7 @@ class GptSoVits(nn.Module):
         audio = self.vits(text_seq, pred_semantic, ref_audio)
         if debug:
             import onnxruntime
-            sess = onnxruntime.InferenceSession("onnx/koharu/koharu_vits.onnx", providers=["CPU"])
+            sess = onnxruntime.InferenceSession("onnx/plasticfork1/plasticfork1_vits.onnx", providers=["CPU"])
             audio1 = sess.run(None, {
                 "text_seq" : text_seq.detach().cpu().numpy(),
                 "pred_semantic" : pred_semantic.detach().cpu().numpy(), 
@@ -265,6 +270,22 @@ class SSLModel(nn.Module):
 
     def forward(self, ref_audio_16k):
         return self.ssl.model(ref_audio_16k)["last_hidden_state"].transpose(1, 2)
+    
+    def export(self, ref_audio_16k, project_name):
+        self.ssl.model.eval()
+        torch.onnx.export(
+            self,
+            (ref_audio_16k),
+            f"onnx/{project_name}/{project_name}_cnhubert.onnx",
+            input_names=["ref_audio_16k"],
+            output_names=["last_hidden_state"],
+            dynamic_axes={
+                "ref_audio_16k": {1 : "text_length"},
+                "last_hidden_state": {2 : "pred_length"}
+            },
+            opset_version=17,
+            verbose=False
+        )
 
 
 def export(vits_path, gpt_path, project_name):
@@ -300,6 +321,7 @@ def export(vits_path, gpt_path, project_name):
 
     soundfile.write("out.wav", a, vits.hps.data.sampling_rate)
 
+    ssl.export(ref_audio_16k, project_name)
     gpt_sovits.export(ref_seq, text_seq, ref_bert, text_bert, ref_audio_sr, ssl_content, project_name)
 
     MoeVSConf = {
@@ -326,9 +348,9 @@ if __name__ == "__main__":
     except:
         pass
 
-    gpt_path = "GPT_weights/nahida-e25.ckpt"
-    vits_path = "SoVITS_weights/nahida_e30_s3930.pth"
-    exp_path = "nahida"
+    gpt_path = "GPT_weights/plasticfork1-e15.ckpt"
+    vits_path = "SoVITS_weights/plasticfork1_e8_s72.pth"
+    exp_path = "plasticfork1"
     export(vits_path, gpt_path, exp_path)
 
     # soundfile.write("out.wav", a, vits.hps.data.sampling_rate)

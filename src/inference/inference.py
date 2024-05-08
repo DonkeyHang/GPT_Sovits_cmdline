@@ -83,7 +83,9 @@ def get_args_vscode_debug():
     parser.add_argument("--gpt_weights", help="Path to gpt weights file",
                         default="GPT_weights/plasticfork1-e15.ckpt")
     parser.add_argument("--parameters_file", type=str, help="File containing parameters for batch processing",
-                        default='inference_parameters_test.txt')
+                        default='inference_parameters_test.json')
+        # parser.add_argument("--parameters_file", type=str, help="File containing parameters for batch processing",
+                        # default='inference_parameters_test.txt')
     parser.add_argument("--input_folder", type=str, help="Folder of the input audio files",
                         default='/Users/donkeyddddd/Documents/Rx_projects/git_projects/GPT_Sovits_cmdline/input_audio')
     parser.add_argument("--output_folder", type=str, help="Folder to save the output audio files",
