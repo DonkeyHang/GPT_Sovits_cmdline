@@ -8,7 +8,6 @@ import torch
 import torchaudio
 from torch import nn
 from feature_extractor import cnhubert
-# cnhubert_base_path = "/pretrained_models/chinese-hubert-base"
 cnhubert_base_path = "/Users/donkeyddddd/Documents/Rx_projects/git_projects/GPT_Sovits_cmdline/pretrained_models/chinese-hubert-base"
 cnhubert.cnhubert_base_path=cnhubert_base_path
 ssl_model = cnhubert.get_model()
@@ -310,6 +309,7 @@ def export(vits_path, gpt_path, project_name):
     ssl_content = ssl(ref_audio_16k).float()
     
     debug = False
+    # debug = True
 
     if debug:
         a, b = gpt_sovits(ref_seq, text_seq, ref_bert, text_bert, ref_audio_sr, ssl_content, debug=debug)
@@ -319,7 +319,7 @@ def export(vits_path, gpt_path, project_name):
     
     a = gpt_sovits(ref_seq, text_seq, ref_bert, text_bert, ref_audio_sr, ssl_content).detach().cpu().numpy()
 
-    soundfile.write("out.wav", a, vits.hps.data.sampling_rate)
+    soundfile.write("/Users/donkeyddddd/Documents/Rx_projects/git_projects/GPT_Sovits_cmdline/output_audio/out.wav", a, vits.hps.data.sampling_rate)
 
     ssl.export(ref_audio_16k, project_name)
     gpt_sovits.export(ref_seq, text_seq, ref_bert, text_bert, ref_audio_sr, ssl_content, project_name)
