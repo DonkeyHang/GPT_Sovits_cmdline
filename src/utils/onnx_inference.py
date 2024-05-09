@@ -126,7 +126,7 @@ def inference():
     text_bert = torch.zeros((text_seq.shape[1], 1024)).float()
 
     ref_audio_16k = torchaudio.functional.resample(ref_audio,48000,16000).float()
-    vits_hps_data_sampling_rate = 48000
+    vits_hps_data_sampling_rate = 32000
     ref_audio_sr = torchaudio.functional.resample(ref_audio,48000,vits_hps_data_sampling_rate).float()
 
     zero_wav = np.zeros(
