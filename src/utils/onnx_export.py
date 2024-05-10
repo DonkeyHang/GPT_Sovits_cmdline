@@ -342,15 +342,34 @@ def export(vits_path, gpt_path, project_name):
         json.dump(MoeVSConf, MoeVsConfFile, indent = 4)
 
 
+def onnx_export_plasticfork():
+    gpt_path = "GPT_weights/plasticfork1-e15.ckpt"
+    vits_path = "SoVITS_weights/plasticfork1_e8_s72.pth"
+    exp_path = "plasticfork1"
+
+    return gpt_path,vits_path,exp_path
+
+def onnx_export_kuileblanc():
+    abs_folder_path = "/Users/donkeyddddd/Documents/Rx_projects/git_projects/GPT_Sovits_cmdline/hugginface_model/parrots-gpt-sovits-speaker/"
+    speaker_name = "KuileBlanc"
+
+    gpt_path = os.path.join(abs_folder_path,speaker_name,"sovits.pth")
+    vits_path = os.path.join(abs_folder_path,speaker_name,"gpt.ckpt")
+    exp_path = speaker_name
+
+    return gpt_path,vits_path,exp_path
+
+
 if __name__ == "__main__":
     try:
         os.mkdir("onnx")
     except:
         pass
 
-    gpt_path = "GPT_weights/plasticfork1-e15.ckpt"
-    vits_path = "SoVITS_weights/plasticfork1_e8_s72.pth"
-    exp_path = "plasticfork1"
+
+    # vits_path, gpt_path, exp_path = onnx_export_plasticfork()
+    vits_path, gpt_path, exp_path = onnx_export_kuileblanc()
+
     export(vits_path, gpt_path, exp_path)
 
     # soundfile.write("out.wav", a, vits.hps.data.sampling_rate)

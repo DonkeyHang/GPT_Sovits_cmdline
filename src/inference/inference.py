@@ -78,18 +78,35 @@ def process_batch(sovits_weights, gpt_weights, input_folder, output_folder, para
 
 def get_args_vscode_debug():
     parser = argparse.ArgumentParser(description="Batch Run TTS Inference")
+    # parser.add_argument("--sovits_weights", help="Path to sovits weights file",
+    #                     default="SoVITS_weights/plasticfork1_e8_s72.pth")
+    # parser.add_argument("--gpt_weights", help="Path to gpt weights file",
+    #                     default="GPT_weights/plasticfork1-e15.ckpt")
+    # parser.add_argument("--parameters_file", type=str, help="File containing parameters for batch processing",
+    #                     default='inference_parameters_test.json')
+    #     # parser.add_argument("--parameters_file", type=str, help="File containing parameters for batch processing",
+    #                     # default='inference_parameters_test.txt')
+    # parser.add_argument("--input_folder", type=str, help="Folder of the input audio files",
+    #                     default='/Users/donkeyddddd/Documents/Rx_projects/git_projects/GPT_Sovits_cmdline/input_audio')
+    # parser.add_argument("--output_folder", type=str, help="Folder to save the output audio files",
+    #                     default='/Users/donkeyddddd/Documents/Rx_projects/git_projects/GPT_Sovits_cmdline/output_audio/')
+
+    abs_folder_path = "/Users/donkeyddddd/Documents/Rx_projects/git_projects/GPT_Sovits_cmdline/hugginface_model/parrots-gpt-sovits-speaker/"
+    speaker_name = "KuileBlanc"
+    
+
     parser.add_argument("--sovits_weights", help="Path to sovits weights file",
-                        default="SoVITS_weights/plasticfork1_e8_s72.pth")
+                        default=os.path.join(abs_folder_path,speaker_name,"sovits.pth"))
     parser.add_argument("--gpt_weights", help="Path to gpt weights file",
-                        default="GPT_weights/plasticfork1-e15.ckpt")
+                        default=os.path.join(abs_folder_path,speaker_name,"gpt.ckpt"))
     parser.add_argument("--parameters_file", type=str, help="File containing parameters for batch processing",
-                        default='inference_parameters_test.json')
-        # parser.add_argument("--parameters_file", type=str, help="File containing parameters for batch processing",
-                        # default='inference_parameters_test.txt')
+                        default=os.path.join(abs_folder_path,speaker_name,"config.json"))
     parser.add_argument("--input_folder", type=str, help="Folder of the input audio files",
-                        default='/Users/donkeyddddd/Documents/Rx_projects/git_projects/GPT_Sovits_cmdline/input_audio')
+                        default=os.path.join(abs_folder_path,speaker_name))
     parser.add_argument("--output_folder", type=str, help="Folder to save the output audio files",
                         default='/Users/donkeyddddd/Documents/Rx_projects/git_projects/GPT_Sovits_cmdline/output_audio/')
+
+
 
     return parser.parse_args(args=[])
 
@@ -109,6 +126,7 @@ if __name__ == "__main__":
     #                     default='input_audio')
     # parser.add_argument("--output_folder", type=str, help="Folder to save the output audio files",
     #                     default='output_audio')
+
     # args = parser.parse_args()
     
     # ============================

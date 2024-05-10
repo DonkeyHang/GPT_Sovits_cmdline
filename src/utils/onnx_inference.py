@@ -11,7 +11,8 @@ import onnxruntime
 import os
 from text import cleaned_text_to_sequence
 # from text.japanese import g2p
-from text.chinese import g2p,text_normalize
+# from text.chinese import g2p,text_normalize
+from text.english import g2p
 import soundfile
 
 import ffmpeg
@@ -19,6 +20,9 @@ import numpy as np
 import librosa
 from my_utils import load_audio
 
+ONNX_FOLDER_PATH = "/Users/donkeyddddd/Documents/Rx_projects/git_projects/GPT_Sovits_cmdline/onnx"
+MODEL_FOLDER_PATH = "/Users/donkeyddddd/Documents/Rx_projects/git_projects/GPT_Sovits_cmdline/hugginface_model/parrots-gpt-sovits-speaker"
+ONNX_SPEAKER_NAME = "KuileBlanc"
 
 class T2SModel(nn.Module):
     def __init__(self):
@@ -27,9 +31,13 @@ class T2SModel(nn.Module):
         self.max_sec = 54
         self.top_k = 5
         self.early_stop_num = torch.LongTensor([self.hz * self.max_sec])
-        self.sess_encoder = onnxruntime.InferenceSession(f"./onnx/plasticfork1/plasticfork1_t2s_encoder.onnx", providers=["CPUExecutionProvider"])
-        self.sess_fsdec = onnxruntime.InferenceSession(f"./onnx/plasticfork1/plasticfork1_t2s_fsdec.onnx", providers=["CPUExecutionProvider"])
-        self.sess_sdec = onnxruntime.InferenceSession(f"./onnx/plasticfork1/plasticfork1_t2s_sdec.onnx", providers=["CPUExecutionProvider"])
+        
+        self.sess_encoder = onnxruntime.InferenceSession(os.path.join(ONNX_FOLDER_PATH,ONNX_SPEAKER_NAME,ONNX_SPEAKER_NAME+"_t2s_encoder.onnx"), providers=["CPUExecutionProvider"])
+        self.sess_fsdec = onnxruntime.InferenceSession(os.path.join(ONNX_FOLDER_PATH,ONNX_SPEAKER_NAME,ONNX_SPEAKER_NAME+"_t2s_fsdec.onnx"), providers=["CPUExecutionProvider"])
+        self.sess_sdec = onnxruntime.InferenceSession(os.path.join(ONNX_FOLDER_PATH,ONNX_SPEAKER_NAME,ONNX_SPEAKER_NAME+"_t2s_sdec.onnx"), providers=["CPUExecutionProvider"])
+        # self.sess_encoder = onnxruntime.InferenceSession(f"./onnx/plasticfork1/plasticfork1_t2s_encoder.onnx", providers=["CPUExecutionProvider"])
+        # self.sess_fsdec = onnxruntime.InferenceSession(f"./onnx/plasticfork1/plasticfork1_t2s_fsdec.onnx", providers=["CPUExecutionProvider"])
+        # self.sess_sdec = onnxruntime.InferenceSession(f"./onnx/plasticfork1/plasticfork1_t2s_sdec.onnx", providers=["CPUExecutionProvider"])
 
     def forward(self, ref_seq, text_seq, ref_bert, text_bert, ssl_content):
         early_stop_num = self.early_stop_num
@@ -76,7 +84,7 @@ class GptSoVits(nn.Module):
     def __init__(self, t2s):
         super().__init__()
         self.t2s = t2s
-        self.sess = onnxruntime.InferenceSession("./onnx/plasticfork1/plasticfork1_vits.onnx", providers=["CPUExecutionProvider"])
+        self.sess = onnxruntime.InferenceSession(os.path.join(ONNX_FOLDER_PATH,ONNX_SPEAKER_NAME,ONNX_SPEAKER_NAME+"_vits.onnx"), providers=["CPUExecutionProvider"])
 
     def forward(self, ref_seq, text_seq, ref_bert, text_bert, ref_audio, ssl_content):
         pred_semantic = self.t2s(ref_seq, text_seq, ref_bert, text_bert, ssl_content)
@@ -91,7 +99,7 @@ class GptSoVits(nn.Module):
 class SSLModel(nn.Module):
     def __init__(self):
         super().__init__()
-        self.sess = onnxruntime.InferenceSession("./onnx/plasticfork1/plasticfork1_cnhubert.onnx", providers=["CPUExecutionProvider"])
+        self.sess = onnxruntime.InferenceSession(os.path.join(ONNX_FOLDER_PATH,ONNX_SPEAKER_NAME,ONNX_SPEAKER_NAME+"_cnhubert.onnx"), providers=["CPUExecutionProvider"])
 
     def forward(self, ref_audio_16k):
         last_hidden_state = self.sess.run(None, {
@@ -107,18 +115,21 @@ def inference():
 
     ref_audio = torch.randn((1, 48000 * 5)).float()
 
-    input_audio = "/Users/donkeyddddd/Documents/Rx_projects/git_projects/GPT_Sovits_cmdline/input_audio/plasticfork_4s.wav"
+    input_audio = os.path.join(MODEL_FOLDER_PATH,ONNX_SPEAKER_NAME,"ref.wav")
     # ref_phones = g2p("水をマレーシアから買わなくてはならない。")
-    ref_text = "嗯未来呢，我想继续忠实记录自己的生活。"
-    ref_phones,_ = g2p(text_normalize(ref_text))
+    # ref_text = "嗯未来呢，我想继续忠实记录自己的生活。"
+    ref_text = "Beside sands. Is that a fact? I'd love to capture a thunderbird!"
+    # ref_phones,_ = g2p(text_normalize(ref_text))
+    ref_phones = g2p(ref_text)
 
     ref_audio = torch.tensor([load_audio(input_audio, 48000)]).float()
 
     ref_seq = torch.LongTensor([cleaned_text_to_sequence(ref_phones)])
 
     # text_phones = g2p("音声合成のテストを行なっています。")
-    src_text = "快乐的一只小跳蛙，当哩个当哩个当哩个当。"
-    text_phones,_ = g2p(text_normalize(src_text))
+    # src_text = "快乐的一只小跳蛙，当哩个当哩个当哩个当。"
+    src_text = "fee,town,long,,you mother fucker!!!holy shit,kick your asshole,stupid!"
+    text_phones = g2p(src_text)
     text_seq = torch.LongTensor([cleaned_text_to_sequence(text_phones)])
 
     # empty for ja or en
