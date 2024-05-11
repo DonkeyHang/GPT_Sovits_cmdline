@@ -169,6 +169,7 @@ def read_dict_new():
 
     return g2p_dict
 
+
 def hot_reload_hot(g2p_dict):
     with open(CMU_DICT_HOT_PATH) as f:
         line = f.readline()
@@ -271,17 +272,19 @@ class en_G2p(G2p):
             # 还原 g2p_en 小写操作逻辑
             word = o_word.lower()
 
+            # 先把单字母推出去
             if re.search("[a-z]", word) is None:
                 pron = [word]
-            # 先把单字母推出去
+            
             elif len(word) == 1:
                 # 单读 A 发音修正, 这里需要原格式 o_word 判断大写
                 if o_word == "A":
                     pron = ['EY1']
                 else:
                     pron = self.cmu[word][0]
-            # g2p_en 原版多音字处理
+            
             elif word in self.homograph2features:  # Check homograph
+                # g2p_en 原版多音字处理
                 pron1, pron2, pos1 = self.homograph2features[word]
                 if pos.startswith(pos1):
                     pron = pron1
@@ -362,7 +365,7 @@ def g2p(text):
 
 if __name__ == "__main__":
     # print(get_dict())
-    print(g2p("hello"))
+    # print(g2p("hello"))
     print(g2p("In this; paper, we propose 1 DSPGAN, a GAN-based universal vocoder."))
     # all_phones = set()
     # for k, syllables in eng_dict.items():

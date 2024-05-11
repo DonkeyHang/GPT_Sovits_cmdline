@@ -128,7 +128,8 @@ def inference():
 
     # text_phones = g2p("音声合成のテストを行なっています。")
     # src_text = "快乐的一只小跳蛙，当哩个当哩个当哩个当。"
-    src_text = "fee,town,long,,you mother fucker!!!holy shit,kick your asshole,stupid!"
+    # src_text = "fee,town,long,,you mother fucker!!!holy shit,kick your asshole,stupid!"
+    src_text = "come on,light weight baby!!!"
     text_phones = g2p(src_text)
     text_seq = torch.LongTensor([cleaned_text_to_sequence(text_phones)])
 
