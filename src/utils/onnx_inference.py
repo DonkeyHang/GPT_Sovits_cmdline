@@ -11,8 +11,8 @@ import onnxruntime
 import os
 from text import cleaned_text_to_sequence
 # from text.japanese import g2p
-# from text.chinese import g2p,text_normalize
-from text.english import g2p
+from text.chinese import g2p,text_normalize
+# from text.english import g2p
 import soundfile
 
 import ffmpeg
@@ -22,7 +22,7 @@ from my_utils import load_audio
 
 ONNX_FOLDER_PATH = "/Users/donkeyddddd/Documents/Rx_projects/git_projects/GPT_Sovits_cmdline/onnx"
 MODEL_FOLDER_PATH = "/Users/donkeyddddd/Documents/Rx_projects/git_projects/GPT_Sovits_cmdline/hugginface_model/parrots-gpt-sovits-speaker"
-ONNX_SPEAKER_NAME = "KuileBlanc"
+ONNX_SPEAKER_NAME = "MaiMai"
 
 class T2SModel(nn.Module):
     def __init__(self):
@@ -115,22 +115,28 @@ def inference():
 
     ref_audio = torch.randn((1, 48000 * 5)).float()
 
-    input_audio = os.path.join(MODEL_FOLDER_PATH,ONNX_SPEAKER_NAME,"ref.wav")
+    # input_audio = os.path.join(MODEL_FOLDER_PATH,ONNX_SPEAKER_NAME,"ref.wav")
+    input_audio = "/Users/donkeyddddd/Documents/Rx_projects/git_projects/GPT_Sovits_cmdline/input_audio/plasticfork_4s.wav"
+
     # ref_phones = g2p("水をマレーシアから買わなくてはならない。")
-    # ref_text = "嗯未来呢，我想继续忠实记录自己的生活。"
-    ref_text = "Beside sands. Is that a fact? I'd love to capture a thunderbird!"
-    # ref_phones,_ = g2p(text_normalize(ref_text))
-    ref_phones = g2p(ref_text)
+    ref_text = "嗯未来呢，我想继续忠实记录自己的生活。"
+    # ref_text = "那我们，唠也唠了这么久了唠了有十几分钟了我们要不来唱唱，唱唱歌，想听什么，今天想听什么。"
+    # ref_text = "Beside sands. Is that a fact? I'd love to capture a thunderbird!"
+    # ref_text = "hey fucker,kick your ass,your suck!"
+
+    ref_phones,_ = g2p(text_normalize(ref_text))
+    # ref_phones = g2p(ref_text)
 
     ref_audio = torch.tensor([load_audio(input_audio, 48000)]).float()
 
     ref_seq = torch.LongTensor([cleaned_text_to_sequence(ref_phones)])
 
     # text_phones = g2p("音声合成のテストを行なっています。")
-    # src_text = "快乐的一只小跳蛙，当哩个当哩个当哩个当。"
+    # src_text = "嗯未来呢，我想继续忠实记录自己的生活,快乐的一只小跳蛙，当哩个当哩个当哩个当。"
+    src_text = "快乐的一只小跳蛙，八百标兵奔北坡。"
     # src_text = "fee,town,long,,you mother fucker!!!holy shit,kick your asshole,stupid!"
-    src_text = "come on,light weight baby!!!"
-    text_phones = g2p(src_text)
+    # src_text = "come on,light weight baby!!!"
+    text_phones,_ = g2p(text_normalize(src_text))
     text_seq = torch.LongTensor([cleaned_text_to_sequence(text_phones)])
 
     # empty for ja or en
@@ -154,7 +160,7 @@ def inference():
     ssl_content = ssl(ref_audio_16k).float()
 
     a = gpt_sovits(ref_seq, text_seq, ref_bert, text_bert, ref_audio_sr, ssl_content)
-    soundfile.write("/Users/donkeyddddd/Documents/Rx_projects/git_projects/GPT_Sovits_cmdline/output_audio/onnx_res.wav", a.cpu().detach().numpy(), vits_hps_data_sampling_rate)
+    soundfile.write("/Users/donkeyddddd/Documents/Rx_projects/git_projects/GPT_Sovits_cmdline/output_audio/onnx_without_EE_res.wav", a.cpu().detach().numpy(), vits_hps_data_sampling_rate)
 
 if __name__ == "__main__":
     inference()

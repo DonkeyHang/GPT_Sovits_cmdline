@@ -8,7 +8,7 @@ import re
 import wordsegment
 from g2p_en import G2p
 
-from string import punctuation
+# from string import punctuation
 
 from text import symbols
 

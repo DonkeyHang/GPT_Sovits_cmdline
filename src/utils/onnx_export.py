@@ -359,6 +359,16 @@ def onnx_export_kuileblanc():
 
     return gpt_path,vits_path,exp_path
 
+def onnx_export_maimai():
+    abs_folder_path = "/Users/donkeyddddd/Documents/Rx_projects/git_projects/GPT_Sovits_cmdline/hugginface_model/parrots-gpt-sovits-speaker/"
+    speaker_name = "MaiMai"
+
+    gpt_path = os.path.join(abs_folder_path,speaker_name,"sovits.pth")
+    vits_path = os.path.join(abs_folder_path,speaker_name,"gpt.ckpt")
+    exp_path = speaker_name
+
+    return gpt_path,vits_path,exp_path
+
 
 if __name__ == "__main__":
     try:
@@ -368,7 +378,8 @@ if __name__ == "__main__":
 
 
     # vits_path, gpt_path, exp_path = onnx_export_plasticfork()
-    vits_path, gpt_path, exp_path = onnx_export_kuileblanc()
+    # vits_path, gpt_path, exp_path = onnx_export_kuileblanc()
+    vits_path, gpt_path, exp_path = onnx_export_maimai()
 
     export(vits_path, gpt_path, exp_path)
 
